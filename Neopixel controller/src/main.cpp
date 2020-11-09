@@ -20,14 +20,15 @@ CRGB leds[length];
 
 IPAddress apIP(42, 42, 42, 42);
 
+bool state = false;
+
 // AsyncWebServer on port 80
 AsyncWebServer server(80);
 
 // Color convert functions
 long stringToHex(string color)
 {
-  string preConversion = color.substr(1);
-  long hexColor = strtol(preConversion.c_str(), NULL, 16);
+  long hexColor = strtol(color.c_str(), NULL, 16);
 
   return hexColor;
 }
@@ -52,6 +53,8 @@ void drawPixel(int x, int y, string color)
     }
 
     leds[position - 1] = stringToHex(color);
+
+    FastLED.show();
   }
 }
 
@@ -100,19 +103,46 @@ void setup()
     request->send(LittleFS, "/index.js", " application/javascript");
   });
 
+  server.on("/color", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (request->hasParam("x") && request->hasParam("y") && request->hasParam("color"))
+    {
+      AsyncWebParameter *x = request->getParam("x");
+      AsyncWebParameter *y = request->getParam("y");
+      AsyncWebParameter *color = request->getParam("color");
+
+      int x_pixel = atoi(x->value().c_str());
+      int y_pixel = atoi(y->value().c_str());
+      string color_pixel(color->value().c_str());
+
+      drawPixel(x_pixel, y_pixel, color_pixel);
+
+      request->send(200, "text/plain", "Okela");
+    }
+    else
+    {
+      request->send(400, "text/plain", "Bad request: Missing arguments");
+    }
+  });
+
+  server.on("/toggle", HTTP_GET, [](AsyncWebServerRequest *request) {
+    state = !state;
+
+    if (state)
+    {
+      fill_solid(leds, length, CRGB::Gray);
+    }
+    else
+      FastLED.clear();
+    FastLED.show();
+    request->send(200, "text/plain", "Okela");
+  });
+
+  server.on("/snake", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/plain", "Okela");
+  });
+
   server.begin();
 }
 void loop()
 {
-
-  for (int i = 1; i <= HEIGHT; i++)
-  {
-    for (int o = 1; o <= WIDTH; o++)
-    {
-      drawPixel(o, i, "#121212");
-    }
-  }
-  drawPixel(1, 2, "#ff1212");
-  drawPixel(2, 3, "#ff1212");
-  FastLED.show();
 }
