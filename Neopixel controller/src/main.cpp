@@ -220,7 +220,7 @@ void setup()
       fill_solid(leds, length, CRGB::Gray);
     }
     else
-      FastLED.clear();
+      fill_solid(leds, length, CRGB::Black);
     FastLED.show();
     request->send(200, "text/plain", "Okela");
   });
@@ -284,6 +284,7 @@ void loop()
     Serial.println("Running");
     delay(40);
   }
+  FastLED.show();
 }
 
 // Code written by Pham Tuan Binh. Feel free to modify it, just credit me in the end.
