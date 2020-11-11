@@ -2,11 +2,14 @@
 #include <Arduino.h>
 #include <string>
 #include "FastLED.h"
-#include "LittleFS.h"
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-//#include <JPEGDecoder.h>
+#include <TaskScheduler.h>
+
+#define FS_NO_GLOBALS //avoids conflicts with JPEGDecoder
+#include <FS.h>
+#include <JPEGDecoder.h>
 
 // Custom library
 #include <Snake.h> // Original by Emanuel Knöpfel (This library have been modified for compatibility. Original lib may malfunction in this code)
@@ -28,11 +31,16 @@ bool state = false;
 
 bool snakeState = false;
 
+bool animationState = false;
+
 // AsyncWebServer on port 80
 AsyncWebServer server(80);
 
 // Snake game
 Snake snakeGame(6, 6, 10);
+
+// hold uploaded file
+fs::File fsUploadFile;
 
 // Gamma correction
 const uint8_t PROGMEM gamma8[] = {
@@ -83,6 +91,7 @@ int positionCalc(int x, int y)
 
     return position;
   }
+  return 0;
 }
 
 byte drawPixel(int x, int y, string color)
@@ -91,8 +100,6 @@ byte drawPixel(int x, int y, string color)
   int position = positionCalc(x, y);
 
   leds[position - 1] = stringToHex(color);
-
-  FastLED.show();
 
   return 0;
 }
@@ -103,8 +110,6 @@ byte drawPixel(byte x, byte y, byte r, byte g, byte b)
 
   leds[position - 1] = CRGB(r, g, b);
 
-  FastLED.show();
-
   return position;
 }
 // CRGB support
@@ -114,9 +119,127 @@ byte drawPixel(byte x, byte y, CRGB color)
 
   leds[position - 1] = color;
 
-  FastLED.show();
-
   return position;
+}
+
+// Animation Functions
+void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+{
+  if (!index)
+  {
+    if (!filename.startsWith("/"))
+      filename = "/" + filename;
+    Serial.print("handleFileUpload Name: ");
+    Serial.println(filename);
+    fsUploadFile = SPIFFS.open(filename, "w");
+  }
+  if (fsUploadFile)
+    fsUploadFile.write(data, len);
+  if (final)
+  {
+    if (fsUploadFile)
+      fsUploadFile.close();
+    Serial.print("File upload finish");
+  }
+}
+
+void handleFileList(AsyncWebServerRequest *request)
+{
+  String path = "/";
+  // Assuming there are no subdirectories
+  fs::Dir dir = SPIFFS.openDir(path);
+  String output = "[";
+  while (dir.next())
+  {
+    fs::File entry = dir.openFile("r");
+    // Separate by comma if there are multiple files
+    if (output != "[")
+      output += ",";
+    output += String(entry.name()).substring(1);
+    entry.close();
+  }
+  output += "]";
+  request->send(200, "text/plain", output);
+}
+
+void handleFileDelete(AsyncWebServerRequest *request)
+{
+  // make sure we get a file name as a URL argument
+  if (request->params() == 0)
+    return request->send(400, "text/plain", "Invalid argument");
+  String path = request->getParam(0)->value();
+  // protect root path
+  if (path == "/")
+    return request->send(400, "text/plain", "BAD PATH!");
+  // check if the file exists
+  if (!SPIFFS.exists(path))
+    return request->send(404, "text/plain", "FILE NOT FOUND!");
+  SPIFFS.remove(path);
+  Serial.println("DELETE: " + path);
+  String msg = "deleted file: " + path;
+  request->send(200, "text/plain", msg);
+}
+
+void displayJpegMatrix(String path)
+{
+  if (JpegDec.decodeFsFile(path))
+  {
+    uint32_t mcuPixels = JpegDec.MCUWidth * JpegDec.MCUHeight;
+    uint8_t row = 0;
+    uint8_t col = 0;
+    while (JpegDec.read())
+    {
+      uint16_t *pImg = JpegDec.pImage;
+      for (uint8_t i = 0; i < mcuPixels; i++)
+      {
+        // Extract the red, green, blue values from each pixel
+        uint8_t b = uint8_t((*pImg & 0x001F) << 3);   // 5 LSB for blue
+        uint8_t g = uint8_t((*pImg & 0x07C0) >> 3);   // 6 'middle' bits for green
+        uint8_t r = uint8_t((*pImg++ & 0xF800) >> 8); // 5 MSB for red
+        // Calculate the matrix index (column and row)
+        col = JpegDec.MCUx * 8 + i % 8;
+        row = JpegDec.MCUy * 8 + i / 8;
+        // Set the matrix pixel to the RGB value
+        drawPixel(col + 1, row + 1,
+                  pgm_read_byte(&gamma8[r]),
+                  pgm_read_byte(&gamma8[g]),
+                  pgm_read_byte(&gamma8[b]));
+      }
+    }
+    FastLED.show();
+  }
+}
+
+void playSequenceCallback()
+{
+  String path = "/";
+  // Assuming there are no subdirectories
+  fs::Dir dir = SPIFFS.openDir(path);
+  while (dir.next())
+  {
+    fs::File entry = dir.openFile("r");
+    String filename = entry.name();
+    if (filename.endsWith(".jpg"))
+    {
+      displayJpegMatrix(filename);
+      delay(20);
+    }
+    entry.close();
+  }
+}
+
+// Task
+Task playSequence(0, TASK_FOREVER, &playSequenceCallback);
+Scheduler runner;
+
+void handleFilePlay()
+{
+  animationState = true;
+}
+
+void handleFileStop()
+{
+  FastLED.clear();
 }
 
 // Functions to adapt snake game. Might overlap existing functions.
@@ -167,8 +290,8 @@ void setup()
   // Begin serial
   Serial.begin(9600);
 
-  // Begin LittleFS
-  if (!LittleFS.begin())
+  // Begin SPIFFS
+  if (!SPIFFS.begin())
   {
     Serial.println("Mount filesystem unsuccessfull");
 
@@ -179,6 +302,10 @@ void setup()
   {
     Serial.println("Mount filesystem successfully");
   }
+
+  // Set up ticker
+  runner.addTask(playSequence);
+  playSequence.enable();
 
   // Set up fast leds;
   FastLED.addLeds<NEOPIXEL, 1>(leds, length);
@@ -204,15 +331,15 @@ void setup()
 
   // Set up server
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(LittleFS, "/index.html", "text/html");
+    request->send(SPIFFS, "/index.html", "text/html");
   });
 
   server.on("/index.css", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(LittleFS, "/index.css", "text/css");
+    request->send(SPIFFS, "/index.css", "text/css");
   });
 
   server.on("/index.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(LittleFS, "/index.js", " application/javascript");
+    request->send(SPIFFS, "/index.js", " application/javascript");
   });
 
   server.on("/color", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -249,6 +376,47 @@ void setup()
     request->send(200, "text/plain", "Okela");
   });
 
+  server.on("/animation", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (request->hasParam("id"))
+    {
+      AsyncWebParameter *id_pointer = request->getParam("id");
+      int id = atoi(id_pointer->value().c_str());
+
+      switch (id)
+      {
+      case 0:
+        Serial.println("Play");
+        animationState = true;
+        snakeState = false;
+        break;
+      case 1:
+        Serial.println("Stop");
+        animationState = false;
+        snakeState = false;
+        fill_solid(leds, length, CRGB::Gray);
+        FastLED.show();
+        break;
+      default:
+        break;
+      }
+    }
+    else
+    {
+      request->send(400, "text/plain", "Missing id");
+    }
+  });
+
+  // list available files
+  server.on("/list", HTTP_GET, handleFileList);
+  // delete file
+  server.on("/delete", HTTP_DELETE, handleFileDelete);
+  // handle file upload
+  server.on(
+      "/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+        request->send(200, "text/plain", "{\"success\":1}");
+      },
+      handleUpload);
+
   server.on("/snake", HTTP_GET, [](AsyncWebServerRequest *request) {
     snakeState = true;
 
@@ -270,6 +438,7 @@ void setup()
       {
       case 0:
         snakeState = true;
+        animationState = false;
         break;
       case 1:
         snakeGame.goUp();
@@ -285,6 +454,7 @@ void setup()
         break;
       case 5:
         snakeState = false;
+        animationState = false;
         fill_solid(leds, length, CRGB::Gray);
         FastLED.show();
         break;
@@ -302,12 +472,15 @@ void setup()
 }
 void loop()
 {
-  if (state && snakeState)
+  if (state && snakeState && !animationState)
   {
     snakeLoop();
-    Serial.println("Running");
-    delay(40);
   }
+  if (state && !snakeState && animationState)
+  {
+    runner.execute();
+  }
+  delay(40);
   FastLED.show();
 }
 
