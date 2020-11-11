@@ -25,7 +25,7 @@ const unsigned int length = WIDTH * HEIGHT;
 
 CRGB leds[length];
 
-IPAddress apIP(42, 42, 42, 42);
+IPAddress apIP(1, 1, 1, 1);
 
 bool state = false;
 
