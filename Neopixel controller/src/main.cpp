@@ -148,17 +148,17 @@ void handleFileList(AsyncWebServerRequest *request)
   String path = "/";
   // Assuming there are no subdirectories
   fs::Dir dir = SPIFFS.openDir(path);
-  String output = "[";
+  String output = "[\"";
   while (dir.next())
   {
     fs::File entry = dir.openFile("r");
     // Separate by comma if there are multiple files
-    if (output != "[")
-      output += ",";
+    if (output != "[\"")
+      output += "\",\"";
     output += String(entry.name()).substring(1);
     entry.close();
   }
-  output += "]";
+  output += "\"]";
   request->send(200, "text/plain", output);
 }
 
@@ -168,12 +168,18 @@ void handleFileDelete(AsyncWebServerRequest *request)
   if (request->params() == 0)
     return request->send(400, "text/plain", "Invalid argument");
   String path = request->getParam(0)->value();
+  path = "/" + path;
+  Serial.println(path);
   // protect root path
   if (path == "/")
     return request->send(400, "text/plain", "BAD PATH!");
   // check if the file exists
   if (!SPIFFS.exists(path))
     return request->send(404, "text/plain", "FILE NOT FOUND!");
+  else
+  {
+    Serial.println("delete");
+  }
   SPIFFS.remove(path);
   Serial.println("DELETE: " + path);
   String msg = "deleted file: " + path;
@@ -379,6 +385,8 @@ void setup()
   server.on("/animation", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (request->hasParam("id"))
     {
+      request->send(200, "text/plain", "Okela");
+
       AsyncWebParameter *id_pointer = request->getParam("id");
       int id = atoi(id_pointer->value().c_str());
 
