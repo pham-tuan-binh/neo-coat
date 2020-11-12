@@ -23,6 +23,8 @@ using namespace std;
 
 const unsigned int length = WIDTH * HEIGHT;
 
+const int Temperture = 0xFF4827;
+
 CRGB leds[length];
 
 IPAddress apIP(1, 1, 1, 1);
@@ -316,6 +318,8 @@ void setup()
   // Set up fast leds;
   FastLED.addLeds<NEOPIXEL, 1>(leds, length);
 
+  FastLED.setTemperature(Temperture);
+
   FastLED.clear();
   FastLED.show();
 
@@ -488,6 +492,7 @@ void loop()
   {
     runner.execute();
   }
+  FastLED.setTemperature(Temperture);
   delay(40);
   FastLED.show();
 }
