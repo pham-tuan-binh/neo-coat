@@ -1,6 +1,6 @@
 # neo-coat
 Don't have a girlfriend ? No worries, we have your back with neo-coat, a wifi display controller. With neo-coat, you can do various tasks such as displaying pictures, drawing and playing snake. This repository is made for storing the firmware and instructions of this product. Feel free to mess with it, just remember to credit me in your version :)
-#Ingridients
+# Ingridients
 To make a neo-coat, you'll need:
 - A Neopixel matrix or any leds supported by FastLed. You can alter the software to support any Leds if you wish.
 - An Esp8266. Other boards would require further coding.
@@ -13,7 +13,7 @@ You'll need Platformio for the compilation and upload of this program.
 # Instructions
 Coming soon
 
-#Compatibilty 
+# Compatibilty 
 This sector is for compatibility branch. Here are some instructions on making changes to this branch:
 - If you want to change the dimensions of the matrix, change the macros of HEIGHT and WIDTH at the beginning of the main.cpp. Remember that you also need to change these in index.js in the data folder.
 - If you want to change how pixel position is calculated or how to draw them, change the following function in drawable library in libs folder.
