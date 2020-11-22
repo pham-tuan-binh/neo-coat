@@ -21,8 +21,8 @@
 
 using namespace std;
 
-#define WIDTH 6
-#define HEIGHT 6
+#define WIDTH 8
+#define HEIGHT 8
 #define SSID "NeoCoat (^˵◕ω◕˵^)"
 #define PASSWORD "0903470077"
 
@@ -47,7 +47,7 @@ bool animationState = false;
 AsyncWebServer server(80);
 
 // Snake game
-Snake snakeGame(6, 6, 10);
+Snake snakeGame(WIDTH, HEIGHT, 10);
 
 // Drawable (This is the core of the program)
 Drawable drawable(WIDTH, HEIGHT, leds);

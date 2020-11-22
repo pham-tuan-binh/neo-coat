@@ -19,14 +19,14 @@ int Drawable::positionCalc(int x, int y)
         // Because our matrix data flow is opposite for each concurrent line. We need to change x position based on the line's number.
         // If your matrix is parralel, you must change this part of code.
         // !!!
-        if (y % 2 == 0)
-        {
-            position = y * _WIDTH - (x - 1);
-        }
-        else
-        {
-            position = (y - 1) * _WIDTH + x;
-        }
+        // if (y % 2 == 0)
+        // {
+        //     position = y * _WIDTH - (x - 1);
+        // }
+        // else
+        // {
+        position = (y - 1) * _WIDTH + x;
+        // }
 
         return position;
     }
