@@ -1,5 +1,12 @@
 # neo-coat
 Don't have a girlfriend ? No worries, we have your back with neo-coat, a wifi display controller. With neo-coat, you can do various tasks such as displaying pictures, drawing and playing snake. This repository is made for storing the firmware and instructions of this product. Feel free to mess with it, just remember to credit me in your version :)
+# What is different ? 
+There have been many other firmwares on controlling leds on the internet. Most can exhibit individual features like drawing, animations or playing games. However, neither of them have all of these features combined and made to such perfection like neo-coat does. Here is an overview of what are different:
+- **No computer connection.** Your Esp is the head of everything from the game to it's UI.
+- **An all-in-one solution.** Everything is here, no need for special firmware on different things.
+- **Ease of modification.** This firmware is made for hobbyist to mess with. It's functions are made into objects with careful comments on each code segment. Even a kid can mess with it thanks to the insane level of abstractions.
+- **Great UI.** None the less, the UI is amazing following the new, trendy Neomorphism style. 
+- **Speed.** Fastled and Async Web Server, this is a rare combination and is unique to this firmware. 
 # Ingridients
 To make a neo-coat, you'll need:
 - A Neopixel matrix or any leds supported by FastLed. You can alter the software to support any Leds if you wish.
