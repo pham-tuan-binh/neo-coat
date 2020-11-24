@@ -60,7 +60,7 @@ This section is to credit and pay respect for those who contributed largely to t
 - The authors of the **FastLed library** and those who contributed to it.
 - The authors of the **standard libraries** used in the project.
 # Copyright
-Copyright (C) 2014  Pham Tuan Binh
+Copyright (C) 2020 Pham Tuan Binh
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
