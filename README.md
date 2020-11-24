@@ -16,10 +16,10 @@ To make a neo-coat, you'll need:
 You'll need Platformio for the compilation and upload of this program.
 # Instructions
 1. For compiling and uploading the code to your desired microcontrollers:
-  - First, You will need to install **PlatformIO core** or it's plugin on your IDE. Click here for the link: [PlatformIO install](https://platformio.org/install/cli). From here, you will need to use it's CLI to follow my instructions.
-  - Clone my repository onto your machine and open the terminal in the **./Neocoat controller** directory.
-  - Plug in your microcontrollers.
-  - From the terminal, do the following command in order to get it working:
+    - First, You will need to install **PlatformIO core** or it's plugin on your IDE. Click here for the link: [PlatformIO install](https://platformio.org/install/cli). From here, you will need to use it's CLI to follow my instructions.
+    - Clone my repository onto your machine and open the terminal in the **./Neocoat controller** directory.
+    - Plug in your microcontrollers.
+    - From the terminal, do the following command in order to get it working:
 
 ```bash
 # This will install all the libraries needed for this project
