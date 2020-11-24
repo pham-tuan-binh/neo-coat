@@ -43,7 +43,7 @@ platformio run -t upload
 
 ![Cool neomatrix picture](https://lh3.googleusercontent.com/Gfsp2FOrQTHTuUNsIQZY9PbR-xJdObKkZOCz60HuOT01bIstGcPsIMQp31-mnjxP12HbHMUAtPR2I219FyzzL9TQ-xHKR-w5AtPA93Hx2x4ej_W5ZRBVJh0H2t3gCpEwFXwfJTVYMQ=w2400)
 # Notes 
-- If you wish to see the first version of neo-coat, switch to original branch. This branch is the original version and it is optimal for anyone who wants to make a 6x6 matrix as well. Choose this branch if you don't need to alter the code either for your matri's dimensions or just simple interest.
+- If you wish to see the first version of neo-coat, switch to original branch. This branch is the first version of my firmware and it is optimal for anyone who wants to make a 6x6 matrix as well. Choose this branch if you don't need to alter the code either for your matri's dimensions or just simple interest.
 - Switch to compatibility branch for ease of reading and editing. This branch is made for people who want to understand the code and change it. It is optimized by splitting code from the original version to different libraries, thus reducing the complexity of main.cpp. More details in Compatibility sector.
 
 
