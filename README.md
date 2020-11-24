@@ -29,7 +29,7 @@ This sector is for compatibility branch. Here are some instructions on making ch
 This section is to credit and pay respect for those who contributed largely to the project:
 - **Acrobotic** - Animations API
 - **Emanuel Knöpfel** - Snake Library
-- me-no-dev - ESPAsyncWebServer
+- **me-no-dev** - ESPAsyncWebServer
 - The authors of the **FastLed library** and those who contributed to it.
 - The authors of the **standard libraries** used in the project.
 # Copyright
