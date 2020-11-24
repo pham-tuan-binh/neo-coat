@@ -14,12 +14,38 @@ To make a neo-coat, you'll need:
 - An Esp8266. Other boards would require further coding.
 - Power supply that can power your matrix and your esp8266. For Neopixels and esp8266, you can use a 5v charger ( any smartphone charger ) and calculate the Amps by the following formula: Numbers of Leds * 60mA = I;
 You'll need Platformio for the compilation and upload of this program.
+# Instructions
+1. For compiling and uploading the code to your desired microcontrollers:
+  - First, You will need to install **PlatformIO core** or it's plugin on your IDE. Click here for the link: [PlatformIO install](https://platformio.org/install/cli). From here, you will need to use it's CLI to follow my instructions.
+  - Clone my repository onto your machine and open the terminal in the **./Neocoat controller** directory.
+  - Plug in your microcontrollers.
+  - From the terminal, do the following command in order to get it working:
 
+```bash
+# This will install all the libraries needed for this project
+platformio lib install
+
+# This will upload the filesystem
+platformio run -t uploadfs
+
+# This will build your firmware
+platformio run -t build
+
+# This will upload your firmware 
+platformio run -t upload
+
+# Tadah you're done
+```
+
+2. For making your own implementation of neo-coat, check out the **notes** and **compatibility** section.
+
+3. For making the amazing **NeoCoat - The thing**, a video will be provided shortly. Here is a demo picture:
+
+![Cool neomatrix picture](https://lh3.googleusercontent.com/Gfsp2FOrQTHTuUNsIQZY9PbR-xJdObKkZOCz60HuOT01bIstGcPsIMQp31-mnjxP12HbHMUAtPR2I219FyzzL9TQ-xHKR-w5AtPA93Hx2x4ej_W5ZRBVJh0H2t3gCpEwFXwfJTVYMQ=w2400)
 # Notes 
 - If you wish to see the first version of neo-coat, switch to original branch. This branch is the original version and it is optimal for anyone who wants to make a 6x6 matrix as well. Choose this branch if you don't need to alter the code either for your matri's dimensions or just simple interest.
 - Switch to compatibility branch for ease of reading and editing. This branch is made for people who want to understand the code and change it. It is optimized by splitting code from the original version to different libraries, thus reducing the complexity of main.cpp. More details in Compatibility sector.
-# Instructions
-Coming soon
+
 
 # Compatibilty 
 This sector is for compatibility branch. Here are some instructions on making changes to this branch:
