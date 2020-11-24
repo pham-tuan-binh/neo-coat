@@ -1,5 +1,6 @@
 ![Logo image](https://www.dropbox.com/s/7yumycl4y6muwem/neocoat.png?raw=1)
-Don't have a girlfriend ? No worries, we have your back with neo-coat, a wifi display controller. With neo-coat, you can do various tasks such as displaying pictures, drawing and playing snake. This repository is made for storing the firmware and instructions of this product. Feel free to mess with it, just remember to credit me in your version :)
+
+> Don't have a girlfriend ? No worries, we have your back with neo-coat, a wifi display controller. With neo-coat, you can do various tasks such as displaying pictures, drawing and playing snake. This repository is made for storing the firmware and instructions of this product. Feel free to mess with it, just remember to credit me in your version :)
 # What is different ? 
 There have been many other firmwares on controlling leds on the internet. Most can exhibit individual features like drawing, animations or playing games. However, neither of them have all of these features combined and made to such perfection like neo-coat does. Here is an overview of what are different:
 - **No computer connection.** Your Esp is the head of everything from the game to it's UI.
