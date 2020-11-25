@@ -50,7 +50,9 @@ platformio run -t upload
 - If you wish to see the first version of neo-coat, switch to original branch. This branch is the first version of my firmware and it is optimal for anyone who wants to make a 6x6 matrix as well. Choose this branch if you don't need to alter the code either for your matri's dimensions or just simple interest.
 - Switch to compatibility branch for ease of reading and editing. This branch is made for people who want to understand the code and change it. It is optimized by splitting code from the original version to different libraries, thus reducing the complexity of main.cpp. More details in Compatibility sector.
 
-
+# Bonus library 
+These are bonus libraries that I wrote during the construction of this firmware. You can check for them in the **bonus libs** directory:
+- **Falling Star** library for simulating falling star effect on a NeoPixel strip.
 # Compatibilty 
 This sector is for compatibility branch. Here are some instructions on making changes to this branch:
 - If you want to change the dimensions of the matrix, change the macros of HEIGHT and WIDTH at the beginning of the main.cpp. Remember that you also need to change these in index.js in the data folder.
