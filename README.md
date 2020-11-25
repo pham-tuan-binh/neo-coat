@@ -10,10 +10,10 @@ There have been many other firmwares on controlling leds on the internet. Most c
 - **Speed.** Fastled and Async Web Server, this is a rare combination and is unique to this firmware. 
 # Ingridients
 To make a neo-coat, you'll need:
-- A Neopixel matrix or any leds supported by FastLed. You can alter the software to support any Leds if you wish.
-- An Esp8266. Other boards would require further coding.
-- Power supply that can power your matrix and your esp8266. For Neopixels and esp8266, you can use a 5v charger ( any smartphone charger ) and calculate the Amps by the following formula: Numbers of Leds * 60mA = I;
-You'll need Platformio for the compilation and upload of this program.
+- A **Neopixel matrix** or any leds supported by FastLed. You can alter the software to support any Leds if you wish.
+- An **Esp8266**. Other boards would require further coding.
+- **Power supply** that can power your matrix and your esp8266. For Neopixels and esp8266, you can use a 5v charger ( any smartphone charger ) and calculate the Amps by the following formula: Numbers of Leds * 60mA = I.
+- A computer with **PlatformIO core** for the compilation and upload of this program.
 # Instructions
 1. For compiling and uploading the code to your desired microcontrollers:
     - First, You will need to install **PlatformIO core** or it's plugin on your IDE. Click here for the link: [PlatformIO install](https://platformio.org/install/cli). From here, you will need to use it's CLI to follow my instructions.
@@ -36,10 +36,14 @@ platformio run -t upload
 
 # Tadah you're done
 ```
+2. For using the firmware:
+    - After uploading the firmware, you should see a new WIFI hotspot in your area. It should be **"NeoCoat (=^･ω･^=)"** (cute huh).
+    - Connect to this WIFI using **"123456789"** as the password. You can set all of this in the main.cpp.
+    - After that, go to your broser and type **1.1.1.1** in the search bar.
+    - You will be directed to the UI shortly.
+3. For making your own implementation of neo-coat, check out the **notes** and **compatibility** section.
 
-2. For making your own implementation of neo-coat, check out the **notes** and **compatibility** section.
-
-3. For making the amazing **NeoCoat - The thing**, a video will be provided shortly. Here is a demo picture:
+4. For making the amazing **NeoCoat - The thing**, a video will be provided shortly. Here is a demo picture:
 
 ![Cool neomatrix picture](https://lh3.googleusercontent.com/Gfsp2FOrQTHTuUNsIQZY9PbR-xJdObKkZOCz60HuOT01bIstGcPsIMQp31-mnjxP12HbHMUAtPR2I219FyzzL9TQ-xHKR-w5AtPA93Hx2x4ej_W5ZRBVJh0H2t3gCpEwFXwfJTVYMQ=w2400)
 # Notes 
