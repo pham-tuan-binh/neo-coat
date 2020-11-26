@@ -53,6 +53,26 @@ platformio run -t upload
 # Bonus library 
 These are bonus libraries that I wrote during the construction of this firmware. You can check for them in the **bonus libs** directory:
 - **Falling Star** library for simulating falling star effect on a NeoPixel strip.
+```C++
+#include "FastLED.h"
+#include <fallingStar.h>
+
+// YOu'll need to know Fastled to use this
+// Init your led CRGB matrix
+CRGB leds[LENGTH];
+
+// Init you starSky
+// LEDS - LEDS_NUM - DELAY 
+starSky ledSky(leds, LENGTH, 50);
+
+// Add a falling star
+// POSITION - COLOR - TRAIL_LENGTH
+ledSky.addStar(0, CHSV(200, 255, 255), random(3, 10));
+
+// Render a frame on your matrix
+// Put this in your loop
+ledSky.render();
+```
 # Compatibilty 
 This sector is for compatibility branch. Here are some instructions on making changes to this branch:
 - If you want to change the dimensions of the matrix, change the macros of HEIGHT and WIDTH at the beginning of the main.cpp. Remember that you also need to change these in index.js in the data folder.
