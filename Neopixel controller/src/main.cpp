@@ -1,11 +1,11 @@
 // Default library
 #include <Arduino.h>
-#include <string>
 #include "FastLED.h"
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <TaskScheduler.h>
+#include <ArduinoJson.h>
 
 #define FS_NO_GLOBALS //avoids conflicts with JPEGDecoder
 #include <FS.h>
@@ -26,13 +26,13 @@ using namespace std;
 #define SSID "NeoCoat (^˵◕ω◕˵^)"
 #define PASSWORD "0903470077"
 
-const unsigned int length = WIDTH * HEIGHT;
+const unsigned int LENGTH = WIDTH * HEIGHT;
 
 // Color temperature
 // FF4827 for TPC coat
 int Temperature = 0xFFFFFF;
 
-CRGB leds[length];
+CRGB leds[LENGTH];
 
 IPAddress apIP(1, 1, 1, 1);
 
@@ -61,6 +61,72 @@ Task playSequence(0, TASK_FOREVER, []() {
 });
 
 Scheduler runner;
+
+//Config
+String convertCRGBtoString(CRGB color)
+{
+  String colorString = String(color.r) + "-" + String(color.g) + "-" + String(color.b);
+  return colorString;
+}
+
+CRGB convertStringtoCRGB(String color)
+{
+  String r, g, b;
+  unsigned int index = color.indexOf("-");
+  r = color.substring(0, index);
+  g = color.substring(index + 1, color.indexOf("-", index + 1));
+  index = color.indexOf("-", index + 1);
+  b = color.substring(index + 1, color.indexOf("-", index + 1));
+
+  CRGB convertedColor = CRGB(r.toInt(), g.toInt(), b.toInt());
+
+  return convertedColor;
+}
+
+void saveLedsState()
+{
+  const size_t capacity = JSON_ARRAY_SIZE(LENGTH) + 860;
+  DynamicJsonDocument ledsJson(capacity);
+
+  for (unsigned int index = 0; index < LENGTH; index++)
+  {
+    ledsJson.add(convertCRGBtoString(leds[index]));
+  }
+
+  fs::File jsonFile = SPIFFS.open("/ledsJson.json", "w");
+
+  serializeJson(ledsJson, jsonFile);
+
+  jsonFile.close();
+}
+
+bool applyLedsState()
+{
+  if (SPIFFS.exists("/ledsJson.json"))
+  {
+    fs::File jsonFile = SPIFFS.open("/ledsJson.json", "r");
+
+    const size_t capacity = JSON_ARRAY_SIZE(LENGTH) + 860;
+    DynamicJsonDocument ledsJson(capacity);
+
+    // Deserialize the JSON document
+    DeserializationError error = deserializeJson(ledsJson, jsonFile);
+    if (error)
+      Serial.println(F("Failed to read file, using default configuration"));
+
+    for (unsigned int index = 0; index < LENGTH; index++)
+    {
+      leds[index] = convertStringtoCRGB(ledsJson[index]);
+    }
+
+    return true;
+  }
+  else
+  {
+    fs::File jsonFile = SPIFFS.open("/ledsJson.json", "w");
+    return false;
+  }
+}
 
 // Animation Functions
 // In c++ this is a way of passing callbacks thar are bounded functions
@@ -132,7 +198,7 @@ void colorPixel(AsyncWebServerRequest *request)
 
     int x_pixel = atoi(x->value().c_str());
     int y_pixel = atoi(y->value().c_str());
-    string color_pixel(color->value().c_str());
+    String color_pixel(color->value().c_str());
 
     drawable.drawPixel(x_pixel, y_pixel, color_pixel);
 
@@ -150,7 +216,7 @@ void changeTemperature(AsyncWebServerRequest *request)
   {
     AsyncWebParameter *color = request->getParam("color");
 
-    string color_temp(color->value().c_str());
+    String color_temp(color->value().c_str());
 
     Temperature = drawable.stringToHex(color_temp);
 
@@ -168,10 +234,16 @@ void toggle(AsyncWebServerRequest *request)
 
   if (state)
   {
-    fill_solid(leds, length, CRGB::Gray);
+    if (!applyLedsState())
+    {
+      fill_solid(leds, LENGTH, CRGB::Gray);
+    }
   }
   else
-    fill_solid(leds, length, CRGB::Black);
+  {
+    saveLedsState();
+    fill_solid(leds, LENGTH, CRGB::Black);
+  }
   FastLED.show();
   request->send(200, "text/plain", "Okela");
 }
@@ -188,15 +260,20 @@ void animate(AsyncWebServerRequest *request)
     switch (id)
     {
     case 0:
+      playSequence.enable();
       Serial.println("Play");
       animationState = true;
       snakeState = false;
       break;
     case 1:
+      playSequence.disable();
       Serial.println("Stop");
       animationState = false;
       snakeState = false;
-      fill_solid(leds, length, CRGB::Gray);
+      if (!applyLedsState())
+      {
+        fill_solid(leds, LENGTH, CRGB::Gray);
+      }
       FastLED.show();
       break;
     default:
@@ -242,7 +319,10 @@ void command(AsyncWebServerRequest *request)
     case 5:
       snakeState = false;
       animationState = false;
-      fill_solid(leds, length, CRGB::Gray);
+      if (!applyLedsState())
+      {
+        fill_solid(leds, LENGTH, CRGB::Gray);
+      }
       FastLED.show();
       break;
     default:
@@ -279,7 +359,7 @@ void setup()
   playSequence.enable();
 
   // Set up fast leds;
-  FastLED.addLeds<NEOPIXEL, 1>(leds, length);
+  FastLED.addLeds<NEOPIXEL, 1>(leds, LENGTH);
 
   FastLED.setTemperature(Temperature);
 
@@ -305,6 +385,10 @@ void setup()
   // Set up server
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(SPIFFS, "/index.html", "text/html");
+  });
+
+  server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(SPIFFS, "/ledsJson.json", "text/plain");
   });
 
   server.on("/index.css", HTTP_GET, [](AsyncWebServerRequest *request) {

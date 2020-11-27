@@ -2,7 +2,6 @@
 #define DRAWABLE
 
 #include <Arduino.h>
-#include <string>
 #include "FastLED.h"
 
 class Drawable
@@ -18,12 +17,12 @@ public:
     {
     }
     // Color convert functions
-    long stringToHex(std::string color);
+    long stringToHex(String color);
 
     // Draw functions
-    // Hex string
+    // Hex String
     int positionCalc(int x, int y);
-    byte drawPixel(int x, int y, std::string color);
+    byte drawPixel(int x, int y, String color);
 
     // RGB value for snake library
     byte drawPixel(byte x, byte y, byte r, byte g, byte b);

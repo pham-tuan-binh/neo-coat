@@ -1,7 +1,7 @@
 #include <drawable.h>
 
 // Color convert functions
-long Drawable::stringToHex(std::string color)
+long Drawable::stringToHex(String color)
 {
     long hexColor = strtol(color.c_str(), NULL, 16);
 
@@ -9,7 +9,7 @@ long Drawable::stringToHex(std::string color)
 }
 
 // Draw functions
-// Hex string
+// Hex String
 int Drawable::positionCalc(int x, int y)
 {
     if (x > 0 && x <= _WIDTH && y > 0 && y <= _HEIGHT)
@@ -33,7 +33,7 @@ int Drawable::positionCalc(int x, int y)
     return 0;
 }
 
-byte Drawable::drawPixel(int x, int y, std::string color)
+byte Drawable::drawPixel(int x, int y, String color)
 {
 
     int position = positionCalc(x, y);
