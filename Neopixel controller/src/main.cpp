@@ -24,7 +24,7 @@ using namespace std;
 #define WIDTH 8
 #define HEIGHT 8
 #define SSID "NeoCoat (^˵◕ω◕˵^)"
-#define PASSWORD "0903470077"
+#define PASSWORD "123456789"
 
 const unsigned int LENGTH = WIDTH * HEIGHT;
 
@@ -53,7 +53,7 @@ Snake snakeGame(WIDTH, HEIGHT, 10);
 Drawable drawable(WIDTH, HEIGHT, leds);
 
 // Animation object
-Animation animation(&animationState, &drawable);
+Animation animation(&animationState, &drawable, 50);
 
 // Task
 Task playSequence(0, TASK_FOREVER, []() {
@@ -219,6 +219,24 @@ void changeTemperature(AsyncWebServerRequest *request)
     String color_temp(color->value().c_str());
 
     Temperature = drawable.stringToHex(color_temp);
+
+    request->send(200, "text/plain", "Okela");
+  }
+  else
+  {
+    request->send(400, "text/plain", "Bad request: Missing arguments");
+  }
+}
+
+void changeDelay(AsyncWebServerRequest *request)
+{
+  if (request->hasParam("time"))
+  {
+    AsyncWebParameter *time = request->getParam("time");
+
+    String time_value(time->value().c_str());
+
+    animation.setDelay(time_value.toInt());
 
     request->send(200, "text/plain", "Okela");
   }
@@ -407,6 +425,8 @@ void setup()
 
   server.on("/temperture", HTTP_GET, changeTemperature);
 
+  server.on("/delay", HTTP_GET, changeDelay);
+
   // list available files
   server.on("/list", HTTP_GET, handleFileList);
   // delete file
@@ -414,6 +434,7 @@ void setup()
   // handle file upload
   server.on(
       "/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+        Serial.println("File uploading");
         request->send(200, "text/plain", "{\"success\":1}");
       },
       handleUpload);

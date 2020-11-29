@@ -3,20 +3,23 @@
 // Animation Functions
 void Animation::handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
+    Serial.println("Uploading ...");
     if (!index)
     {
         if (!filename.startsWith("/"))
             filename = "/" + filename;
         Serial.print("handleFileUpload Name: ");
         Serial.println(filename);
-        fsUploadFile = SPIFFS.open(filename, "w");
+        request->_tempFile = SPIFFS.open(filename, "w");
     }
     if (fsUploadFile)
-        fsUploadFile.write(data, len);
+    {
+        Serial.println("...");
+        request->_tempFile.write(data, len);
+    }
     if (final)
     {
-        if (fsUploadFile)
-            fsUploadFile.close();
+        request->_tempFile.close();
         Serial.print("File upload finish");
     }
 }
@@ -106,10 +109,15 @@ void Animation::playSequenceCallback()
         if (filename.endsWith(".jpg"))
         {
             displayJpegMatrix(filename);
-            delay(20);
+            delay(DELAY);
         }
         entry.close();
     }
+}
+
+void Animation::setDelay(int delay)
+{
+    DELAY = delay;
 }
 
 void Animation::handleFilePlay()

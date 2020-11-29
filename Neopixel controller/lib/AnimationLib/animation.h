@@ -33,9 +33,10 @@ private:
     fs::File fsUploadFile;
     bool *animationState;
     Drawable *drawable;
+    int DELAY;
 
 public:
-    Animation(bool *animationState, Drawable *drawable) : animationState(animationState), drawable(drawable)
+    Animation(bool *animationState, Drawable *drawable, int DELAY) : animationState(animationState), drawable(drawable), DELAY(DELAY)
     {
     }
     // Animation Functions
@@ -46,6 +47,7 @@ public:
     void playSequenceCallback();
     void handleFilePlay();
     void handleFileStop();
+    void setDelay(int delay);
 };
 
 #endif
